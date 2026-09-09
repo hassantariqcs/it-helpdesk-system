@@ -1,23 +1,30 @@
+from ticket import Ticket
+
 tickets = []
+
 
 def create_ticket():
     print("\n--- Create Ticket ---")
 
     name = input("Enter your name: ")
-    issue = input("Decribe the issue: ")
-    priority = input("Priority (Low/Medium/High): ")
+    issue = input("Describe the issue: ")
 
-    ticket = {
-        "id": len(tickets) + 1,
-        "name": name,
-        "issue": issue,
-        "priorty": priority,
-        "status": "Open"
-    }
+    while True:
+        priority = input("Priority (Low/Medium/High): ").capitalize()
+
+        if priority in ["Low", "Medium", "High"]:
+            break
+
+        print("Invalid priority. Please choose Low, Medium or High.")
+
+    ticket_id = len(tickets) + 1
+
+    ticket = Ticket(ticket_id, name, issue, priority)
 
     tickets.append(ticket)
 
-    print(f"\nTicket #{ticket['id']} created successfully!")
+    print(f"\nTicket #{ticket_id} created successfully!")
+
 
 def view_tickets():
     print("\n--- All Tickets ---")
@@ -27,14 +34,8 @@ def view_tickets():
         return
 
     for ticket in tickets:
-        print(f"""
-Ticket ID: {ticket['id']}
-User: {ticket['name']}
-Issue: {ticket['issue']}
-Priority: {ticket['priority']}
-Status: {ticket['status']}
--------------------------
-""")
+        ticket.display()
+
 
 def search_tickets():
     print("\n--- Search Tickets ---")
@@ -44,19 +45,16 @@ def search_tickets():
     found = False
 
     for ticket in tickets:
-        if search in ticket["name"].lower() or search in ticket["issue"].lower():
-            print(f"""
-Ticket ID: {ticket['id']}
-User: {ticket['name']}
-Issue: {ticket['issue']}
-Priority: {ticket['priority']}
-Status: {ticket['status']}
--------------------------
-""")
+        if (
+            search in ticket.name.lower()
+            or search in ticket.issue.lower()
+        ):
+            ticket.display()
             found = True
 
-        if not found:
-            print("No matching tickets found.")
+    if not found:
+        print("No matching tickets found.")
+
 
 def update_ticket():
     print("\n--- Update Ticket ---")
@@ -68,22 +66,31 @@ def update_ticket():
         return
 
     for ticket in tickets:
-        if ticket["id"] == ticket_id:
 
-            print(f"Current status: {ticket['status']}")
+        if ticket.ticket_id == ticket_id:
+
+            print(f"Current status: {ticket.status}")
 
             new_status = input(
-                "Enter new status (Open/In progress/Closed): "
+                "Enter new status (Open/In Progress/Closed): "
             )
 
-            ticket["status"] = new_status
+            valid_statuses = ["Open", "In Progress", "Closed"]
+
+            if new_status not in valid_statuses:
+                print("Invalid status.")
+                return
+
+            ticket.update_status(new_status)
 
             print("Ticket updated successfully!")
             return
 
-        print("Ticket not found.")
+    print("Ticket not found.")
+
 
 def main():
+
     while True:
 
         print("""
@@ -95,8 +102,8 @@ def main():
 2. View Tickets
 3. Search Tickets
 4. Update Ticket
-5. Exit        
-""")      
+5. Exit
+""")
 
         choice = input("Select an option: ")
 
@@ -119,5 +126,6 @@ def main():
         else:
             print("Invalid option. Please try again.")
 
+
 if __name__ == "__main__":
-    main()      
+    main()  
